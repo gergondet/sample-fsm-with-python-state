@@ -18,28 +18,43 @@ StatesFiles:
 VerboseStateFactory: false
 # Additional robots to load
 robots:
+  jvrc1:
+    frames:
+      - name: LeftHandGraspFrame
+        parent: l_wrist
+        X_p_f:
+          translation: [0.0, -0.0085, -0.110]
+      - name: RightHandOpenFrame
+        parent: r_wrist
+        X_p_f:
+          translation: [0.0, 0.0085, -0.1225]
+      - name: LeftGripperCenter
+        parent: LeftGripper
+        X_p_f:
+          translation: [0.0, 0.0, -0.1]
   ground:
     module: env/ground
 # General constraints, always on
 constraints:
 - type: contact
-- type: dynamics
+- type: kinematics
   damper: [0.1, 0.01, 0.5]
 - type: compoundJoint
 # Collision constraint
 collisions:
 - type: collision
   useMinimal: true
+- type: collision
+  r1: jvrc1
+  r2: ground
+  collisions:
+    - body1: L_WRIST_Y_S
+      body2: ground
+      iDist: 0.01
+      sDist: 0.005
+      damping: 0
 # Initial set of contacts
-contacts:
-- r1: jvrc1
-  r2: ground
-  r1Surface: LeftFoot
-  r2Surface: AllGround
-- r1: jvrc1
-  r2: ground
-  r1Surface: RightFoot
-  r2Surface: AllGround
+contacts: []
 
 # Some options for a specific robot
 jvrc1:
@@ -50,9 +65,9 @@ jvrc1:
     stiffness: 2
     weight: 100
 # Implement some additional text states
-states: {}
+states:
+  Sample:
+    base: Python3#sample_states.SampleState
 # Transitions map
 transitions:
-- [SampleFSM_Initial, OK, SampleFSM_Initial, Strict]
-# Initial state
-init: SampleFSM_Initial
+- [Sample, OK, SampleFSM_Initial, Strict]
